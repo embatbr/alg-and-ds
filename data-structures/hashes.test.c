@@ -10,7 +10,8 @@
 
 
 void main() {
-    printf("##### Tests for type 'HashObject' #####\n");
+    printf("### Tests for Data Structures ###\n\n");
+    printf("##### HashObject #####\n");
 
     printf("\nCreating hash_object with key 1, value 120 and types \"ii\"\n");
     HashObject* hash_object = create_hash_object(1, 120, "ii", hash_code(1, 9, 0));
@@ -33,7 +34,7 @@ void main() {
     show_hash_object(hash_object);
 
 
-    printf("\n\n##### Tests for type 'HashTable' #####\n");
+    printf("\n\n##### HashTable #####\n");
 
     printf("\nCreating hash_table with size 0\n");
     HashTable* hash_table = create_hash_table(0);
