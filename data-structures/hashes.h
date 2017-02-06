@@ -6,23 +6,28 @@
 /*
  * key_type and value_type: i - int, c - char
  */
-typedef struct {
+typedef struct _hash_object {
     int key;
-    char key_type;
     int value;
-    char value_type;
+    char* types;
     int code;
-    char valid;
+
+    struct _hash_object* prev;
+    struct _hash_object* next;
+    int length;                 // used only by the list head
+    struct _hash_object* tail;  // used only by the list head
 } HashObject;
 
 // time: O(1); space: O(1)
-int hash_code(int key, int size, int offset);
+int hash_code(int key, int size);
 
 // time: O(1); space: O(1)
-HashObject* create_hash_object(const int key, const int value, const char* types, const int code);
+HashObject* create_hash_object(const int key, const int value, char* types, const int code);
 
 // time: O(1); space: O(1)
-void show_hash_object(const HashObject* hash_object);
+void show_hash_object(const HashObject* hash_object, const int is_linked);
+
+void show_linked_hash_objects(HashObject* hash_object);
 
 
 /*
@@ -34,19 +39,16 @@ typedef struct {
     HashObject** buckets;
 } HashTable;
 
-// time: O(1); space: ?
+// time: O(1); space: O(1)
 HashTable* create_hash_table(const int size);
 
-// time O(N), where N is the table size; space: ?
+// time O(N) (amortized O(Nk), where k is the average list length); space: O(1)
 void show_hash_table(const HashTable* hash_table);
 
-// time: O(1) (amortized O(N)); space: ?
-int put(const HashTable* hash_table, const int key, const int value, const char* types);
+// time: O(1) (amortized O(Nk), k = average list length); space: O(1) (amortized O(k))
+HashObject* put(const HashTable* hash_table, const int key, const int value, char* types);
 
-// time: O(1) (amortized O(N)); space ?
-HashObject* get(const HashTable* hash_table, const int key);
+// // time: O(1) (amortized O(N)); space ?
+// HashObject* get(const HashTable* hash_table, const int key);
 
-HashObject* pop(const HashTable* hash_table, const int key);
-
-// TODO how to delete without affect the get?
-// Maybe with a flag "is_dead" or "idle object", being replaced only when a new key is hashed to the same position
+// HashObject* pop(const HashTable* hash_table, const int key);

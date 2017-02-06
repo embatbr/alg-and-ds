@@ -14,47 +14,64 @@
  */
 
 
-int hash_code(int key, int size, int offset) {
-    int code = (key + offset) % size;
-    return code;
+int hash_code(int key, int size) {
+    return key % size;
 }
 
-HashObject* create_hash_object(const int key, const int value, const char* types, const int code) {
+HashObject* create_hash_object(const int key, const int value, char* types, const int code) {
     HashObject* hash_object = (HashObject*) malloc(sizeof(HashObject));
 
     if(hash_object != NULL) {
         hash_object->key = key;
-        hash_object->key_type = *types;
         hash_object->value = value;
-        hash_object->value_type = *(types + 1);
+        hash_object->types = types;
         hash_object->code = code;
-        hash_object->valid = 1;
+
+        hash_object->prev = hash_object->next = hash_object->tail = NULL;
+        hash_object->length = 0;
     }
 
     return hash_object;
 }
 
-void show_hash_object(const HashObject* hash_object) {
-    if((hash_object == NULL) || !hash_object->valid) {
+void show_hash_object(const HashObject* hash_object, const int is_linked) {
+    if(hash_object == NULL) {
         printf("%p\n", NULL);
     }
     else {
-        printf("[%d] -> ", hash_object->code);
-
-        if(hash_object->key_type == 'i') {
-            printf("%d: ", hash_object->key);
-        }
-        else if(hash_object->key_type == 'c') {
-            printf("%c: ", hash_object->key);
+        if(!is_linked || hash_object->tail != NULL) {
+            printf("(%d) ", hash_object->code);
         }
 
-        if(hash_object->value_type == 'i') {
-            printf("%d\n", hash_object->value);
+        if(*hash_object->types == 'i') {
+            printf("[%d: ", hash_object->key);
         }
-        else if(hash_object->value_type == 'c') {
-            printf("%c\n", hash_object->value);
+        else if(*hash_object->types == 'c') {
+            printf("[%c: ", hash_object->key);
+        }
+
+        if(*(hash_object->types + 1) == 'i') {
+            printf("%d]", hash_object->value);
+        }
+        else if(*(hash_object->types + 1) == 'c') {
+            printf("%c]", hash_object->value);
+        }
+
+        if(is_linked) {
+            printf("->");
+        }
+        else {
+            printf("\n");
         }
     }
+}
+
+void show_linked_hash_objects(HashObject* hash_object) {
+    HashObject* cur_hash_object;
+    for(cur_hash_object = hash_object; cur_hash_object != NULL; cur_hash_object = cur_hash_object->next) {
+        show_hash_object(cur_hash_object, 1);
+    }
+    show_hash_object(cur_hash_object, 1);
 }
 
 
@@ -64,14 +81,16 @@ void show_hash_object(const HashObject* hash_object) {
 
 
 HashTable* create_hash_table(const int size) {
-    HashTable* hash_table = (HashTable*) malloc(sizeof(HashTable));
-
-    if((hash_table == NULL) || (size <= 0)) {
+    if(size <= 0) {
         return NULL;
     }
 
-    hash_table->size = size;
-    hash_table->buckets = (HashObject**) malloc(size * sizeof(HashObject*));
+    HashTable* hash_table = (HashTable*) malloc(sizeof(HashTable));
+
+    if(hash_table != NULL) {
+        hash_table->size = size;
+        hash_table->buckets = (HashObject**) malloc(size * sizeof(HashObject*));
+    }
 
     return hash_table;
 }
@@ -83,70 +102,98 @@ void show_hash_table(const HashTable* hash_table) {
     else {
         printf("size: %d\n", hash_table->size);
         printf("buckets:\n");
-        int i;
+
+        int i, empty = 1;
         for(i = 0; i < hash_table->size; i++) {
             HashObject* bucket = *(hash_table->buckets + i);
-            show_hash_object(bucket);
+            if(bucket != NULL) {
+                empty = 0;
+                show_linked_hash_objects(bucket);
+            }
+        }
+
+        if(empty) {
+            printf("EMPTY\n");
         }
     }
 }
 
-int put(const HashTable* hash_table, const int key, const int value, const char* types) {
-    int num_attempts = 0;
-
+HashObject* put(const HashTable* hash_table, const int key, const int value, char* types) {
     HashObject* hash_object = NULL;
 
-    while(num_attempts < hash_table->size) {
-        int code = hash_code(key, hash_table->size, num_attempts);
-        hash_object = *(hash_table->buckets + code);
+    int code = hash_code(key, hash_table->size);
+    hash_object = *(hash_table->buckets + code);
 
-        if((hash_object == NULL) || !hash_object->valid || (hash_object->key == key)) {
-            if((hash_object != NULL) && !hash_object->valid) {
-                show_hash_object(hash_object);
-            }
+    if(hash_object == NULL) {
+        HashObject* new_hash_object = create_hash_object(key, value, types, code);
+        new_hash_object->length = 1;
+        new_hash_object->tail = new_hash_object;
 
-            HashObject* hash_object = create_hash_object(key, value, types, code);
-            *(hash_table->buckets + code) = hash_object;
+        *(hash_table->buckets + code) = new_hash_object;
 
-            return code;
-        }
-
-        num_attempts++;
+        return new_hash_object;
     }
-
-    return -1;
-}
-
-HashObject* get(const HashTable* hash_table, const int key) {
-    int num_attempts = 0;
-
-    while(num_attempts < hash_table->size) {
-        int code = hash_code(key, hash_table->size, num_attempts);
-
-        HashObject* hash_object = *(hash_table->buckets + code);
-        if(hash_object == NULL) {
-            return NULL;
-        }
-        else if(hash_object->key == key) {
-            if(!hash_object->valid) {
-                return NULL;
+    else {
+        // TODO extract it to function get
+        char key_type = *types;
+        for(; hash_object != NULL; hash_object = hash_object->next) {
+            if(hash_object->key == key && *hash_object->types == key_type) {
+                break;
             }
-
-            return hash_object;
         }
 
-        num_attempts++;
+        HashObject* new_hash_object = hash_object;
+        if(new_hash_object != NULL) {
+            new_hash_object->value = value;
+            new_hash_object->types = types;
+        }
+        else {
+            new_hash_object = create_hash_object(key, value, types, code);
+
+            HashObject* tail = (*(hash_table->buckets + code))->tail;
+            tail->next = new_hash_object;
+            new_hash_object->prev = tail;
+
+            (*(hash_table->buckets + code))->length++;
+            (*(hash_table->buckets + code))->tail = new_hash_object;
+        }
+
+        return new_hash_object;
     }
 
     return NULL;
 }
 
-HashObject* pop(const HashTable* hash_table, const int key) {
-    HashObject* hash_object = get(hash_table, key);
+// HashObject* get(const HashTable* hash_table, const int key) {
+//     int num_attempts = 0;
 
-    if((hash_object != NULL) && (hash_object->key == key) && hash_object->valid) {
-        hash_object->valid = 0;
-    }
+//     while(num_attempts < hash_table->size) {
+//         int code = hash_code(key, hash_table->size, num_attempts);
 
-    return hash_object;
-}
+//         HashObject* hash_object = *(hash_table->buckets + code);
+//         if(hash_object == NULL) {
+//             return NULL;
+//         }
+//         else if(hash_object->key == key) {
+//             if(!hash_object->valid) {
+//                 return NULL;
+//             }
+
+//             return hash_object;
+//         }
+
+//         num_attempts++;
+//     }
+
+//     return NULL;
+// }
+
+// HashObject* pop(const HashTable* hash_table, const int key) {
+//     HashObject* hash_object = get(hash_table, key);
+
+//     if((hash_object != NULL) && (hash_object->key == key) && hash_object->valid) {
+//         hash_object->valid = 0;
+//     }
+
+//     return hash_object;
+// }
