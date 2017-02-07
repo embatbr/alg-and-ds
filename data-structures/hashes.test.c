@@ -11,33 +11,33 @@
 
 void main() {
     printf("### Tests for Data Structures ###\n\n");
-    printf("##### HashObject #####\n");
+    printf("##### HashItem #####\n");
 
-    printf("\nCreating hash_object with key 1, value 120 and types \"ii\"\n");
-    HashObject* hash_object = create_hash_object(1, 120, "ii", hash_code(1, 9));
-    show_hash_object(hash_object, 0);
+    printf("\nCreating hash_item with key 1, value 120 and types \"ii\"\n");
+    HashItem* hash_item = create_hash_item(1, 120, "ii", hash_code(1, 9));
+    show_hash_item(hash_item, 0);
 
-    printf("\nCreating hash_object with key 1, value 'x' and types \"ic\"\n");
-    hash_object = create_hash_object(1, 'x', "ic", hash_code(1, 9));
-    show_hash_object(hash_object, 0);
+    printf("\nCreating hash_item with key 1, value 'x' and types \"ic\"\n");
+    hash_item = create_hash_item(1, 'x', "ic", hash_code(1, 9));
+    show_hash_item(hash_item, 0);
 
-    printf("\nCreating hash_object with key 1, value 120 and types \"ic\"\n");
-    hash_object = create_hash_object(1, 120, "ic", hash_code(1, 9));
-    show_hash_object(hash_object, 0);
+    printf("\nCreating hash_item with key 1, value 120 and types \"ic\"\n");
+    hash_item = create_hash_item(1, 120, "ic", hash_code(1, 9));
+    show_hash_item(hash_item, 0);
 
-    printf("\nCreating hash_object with key 'a', value 'x' and types \"cc\"\n");
-    hash_object = create_hash_object('a', 'x', "cc", hash_code('a', 9));
-    show_hash_object(hash_object, 0);
+    printf("\nCreating hash_item with key 'a', value 'x' and types \"cc\"\n");
+    hash_item = create_hash_item('a', 'x', "cc", hash_code('a', 9));
+    show_hash_item(hash_item, 0);
 
-    printf("\nCreating hash_object with key 97, value 120 and types \"cc\"\n");
-    hash_object = create_hash_object(97, 120, "cc", hash_code(97, 9));
-    show_hash_object(hash_object, 0);
+    printf("\nCreating hash_item with key 97, value 120 and types \"cc\"\n");
+    hash_item = create_hash_item(97, 120, "cc", hash_code(97, 9));
+    show_hash_item(hash_item, 0);
 
-    printf("\nCreating hash_object with key 79, value 145 and types \"ii\", and appending to list\n");
-    hash_object->next = create_hash_object(79, 145, "ii", hash_code(79, 9));
-    hash_object->length = 1;
-    hash_object->tail = hash_object->next;
-    show_linked_hash_objects(hash_object);
+    printf("\nCreating hash_item with key 79, value 145 and types \"ii\", and appending to list\n");
+    hash_item->next = create_hash_item(79, 145, "ii", hash_code(79, 9));
+    hash_item->tail = hash_item->next;
+    hash_item->length = 2;
+    show_linked_hash_items(hash_item);
 
 
     printf("\n\n##### HashTable #####\n");
@@ -51,68 +51,97 @@ void main() {
     show_hash_table(hash_table);
 
     printf("\nInserting (1, 120, \"ii\") into hash_table\n");
-    HashObject* new_hash_object = put(hash_table, 1, 120, "ii");
-    show_hash_object(new_hash_object, 0);
+    HashItem* new_hash_item = put(hash_table, 1, 120, "ii");
+    show_hash_item(new_hash_item, 0);
     show_hash_table(hash_table);
 
     printf("\nInserting (1, 'x', \"ic\") into hash_table\n");
-    new_hash_object = put(hash_table, 1, 'x', "ic");
-    show_hash_object(new_hash_object, 0);
+    new_hash_item = put(hash_table, 1, 'x', "ic");
+    show_hash_item(new_hash_item, 0);
     show_hash_table(hash_table);
 
     printf("\nInserting (100, 145, \"ci\") into hash_table\n");
-    new_hash_object = put(hash_table, 100, 145, "ci");
-    show_hash_object(new_hash_object, 0);
+    new_hash_item = put(hash_table, 100, 145, "ci");
+    show_hash_item(new_hash_item, 0);
+    show_hash_table(hash_table);
+
+    printf("\nInserting (100, 'H', \"ic\") into hash_table\n");
+    new_hash_item = put(hash_table, 100, 'H', "ic");
+    show_hash_item(new_hash_item, 0);
     show_hash_table(hash_table);
 
     printf("\nInserting ('a', 'x', \"cc\") into hash_table\n");
-    new_hash_object = put(hash_table, 'a', 'x', "cc");
-    show_hash_object(new_hash_object, 0);
+    new_hash_item = put(hash_table, 'a', 'x', "cc");
+    show_hash_item(new_hash_item, 0);
     show_hash_table(hash_table);
 
     printf("\nInserting (97, 103, \"cc\") into hash_table\n");
-    new_hash_object = put(hash_table, 97, 103, "cc");
-    show_hash_object(new_hash_object, 0);
+    new_hash_item = put(hash_table, 97, 103, "cc");
+    show_hash_item(new_hash_item, 0);
     show_hash_table(hash_table);
 
     printf("\nInserting (10, 'x', \"ic\") into hash_table\n");
-    new_hash_object = put(hash_table, 10, 'x', "ic");
-    show_hash_object(new_hash_object, 0);
+    new_hash_item = put(hash_table, 10, 'x', "ic");
+    show_hash_item(new_hash_item, 0);
     show_hash_table(hash_table);
 
-    // printf("\nGet element with key 123\n");
-    // hash_object = get(hash_table, 123);
-    // show_hash_object(hash_object);
+    printf("\nInserting (19, 'B', \"ic\") into hash_table\n");
+    new_hash_item = put(hash_table, 19, 'B', "ic");
+    show_hash_item(new_hash_item, 0);
+    show_hash_table(hash_table);
 
-    // printf("\nGet element with key 'a'\n");
-    // hash_object = get(hash_table, 'a');
-    // show_hash_object(hash_object);
+    printf("\nGet element with key 123\n");
+    hash_item = get(hash_table, 123, 'i');
+    show_hash_item(hash_item, 0);
+    show_hash_table(hash_table);
 
-    // printf("\nGet element with key 10\n");
-    // hash_object = get(hash_table, 10);
-    // show_hash_object(hash_object);
+    printf("\nGet element with key 'a'\n");
+    hash_item = get(hash_table, 'a', 'c');
+    show_hash_item(hash_item, 0);
+    show_hash_table(hash_table);
 
-    // printf("\nRemoving element with key 123\n");
-    // hash_object = pop(hash_table, 123);
-    // show_hash_object(hash_object);
-    // show_hash_table(hash_table);
+    printf("\nGet element with key 97\n");
+    hash_item = get(hash_table, 97, 'i');
+    show_hash_item(hash_item, 0);
+    show_hash_table(hash_table);
 
-    // printf("\nRemoving element with key 10\n");
-    // hash_object = pop(hash_table, 10);
-    // show_hash_object(hash_object);
-    // show_hash_table(hash_table);
+    printf("\nGet element with key 10\n");
+    hash_item = get(hash_table, 10, 'i');
+    show_hash_item(hash_item, 0);
+    show_hash_table(hash_table);
 
-    // printf("\nGet removed element (key = 10)\n");
-    // hash_object = get(hash_table, 10);
-    // show_hash_object(hash_object);
+    printf("\nRemoving element with key 123\n");
+    hash_item = pop(hash_table, 123, 'i');
+    show_hash_item(hash_item, 0);
+    show_hash_table(hash_table);
 
-    // printf("\nGet element with same initial hash code (key = 19)\n");
-    // hash_object = get(hash_table, 19);
-    // show_hash_object(hash_object);
+    printf("\nRemoving element with key 'a'\n");
+    hash_item = pop(hash_table, 'a', 'c');
+    show_hash_item(hash_item, 0);
+    show_hash_table(hash_table);
 
-    // // FUDEU
-    // printf("\nInserting (19, 'Z', \"ic\") into hash_table\n");
-    // code = put(hash_table, 19, 'Z', "ic");
-    // printf("code: %d\n", code);
-    // show_hash_table(hash_table);
+    printf("\nRemoving element with key 1 (head)\n");
+    hash_item = pop(hash_table, 1, 'i');
+    show_hash_item(hash_item, 0);
+    show_hash_table(hash_table);
+
+    printf("\nRemoving element with key 19 (tail)\n");
+    hash_item = pop(hash_table, 19, 'i');
+    show_hash_item(hash_item, 0);
+    show_hash_table(hash_table);
+
+    printf("\nRemoving element with key 100 (tail)\n");
+    hash_item = pop(hash_table, 100, 'i');
+    show_hash_item(hash_item, 0);
+    show_hash_table(hash_table);
+
+    printf("\nInserting (100, 'Z', \"ic\") into hash_table\n");
+    hash_item = put(hash_table, 100, 'Z', "ic");
+    show_hash_item(hash_item, 0);
+    show_hash_table(hash_table);
+
+    printf("\nInserting (102, 1, \"ii\") into hash_table\n");
+    hash_item = put(hash_table, 102, 1, "ii");
+    show_hash_item(hash_item, 0);
+    show_hash_table(hash_table);
 }

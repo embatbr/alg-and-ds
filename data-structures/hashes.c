@@ -10,7 +10,7 @@
 
 
 /*
- * Functions for type HashObject
+ * Functions for type HashItem
  */
 
 
@@ -18,43 +18,46 @@ int hash_code(int key, int size) {
     return key % size;
 }
 
-HashObject* create_hash_object(const int key, const int value, char* types, const int code) {
-    HashObject* hash_object = (HashObject*) malloc(sizeof(HashObject));
+HashItem* create_hash_item(const int key, const int value, char* types, const int code) {
+    HashItem* hash_item = (HashItem*) malloc(sizeof(HashItem));
 
-    if(hash_object != NULL) {
-        hash_object->key = key;
-        hash_object->value = value;
-        hash_object->types = types;
-        hash_object->code = code;
+    if(hash_item != NULL) {
+        hash_item->key = key;
+        hash_item->value = value;
+        hash_item->types = types;
+        hash_item->code = code;
 
-        hash_object->prev = hash_object->next = hash_object->tail = NULL;
-        hash_object->length = 0;
+        hash_item->prev = hash_item->next = hash_item->tail = NULL;
+        hash_item->length = 0;
     }
 
-    return hash_object;
+    return hash_item;
 }
 
-void show_hash_object(const HashObject* hash_object, const int is_linked) {
-    if(hash_object == NULL) {
+void show_hash_item(const HashItem* hash_item, const int is_linked) {
+    if(hash_item == NULL) {
         printf("%p\n", NULL);
     }
     else {
-        if(!is_linked || hash_object->tail != NULL) {
-            printf("(%d) ", hash_object->code);
+        if(is_linked && hash_item->tail != NULL) { // is the 1st element in list
+            printf("(%d,%d) ", hash_item->code, hash_item->length);
+        }
+        else if(!is_linked) {
+            printf("(%d) ", hash_item->code);
         }
 
-        if(*hash_object->types == 'i') {
-            printf("[%d: ", hash_object->key);
+        if(*hash_item->types == 'i') {
+            printf("[%d: ", hash_item->key);
         }
-        else if(*hash_object->types == 'c') {
-            printf("[%c: ", hash_object->key);
+        else if(*hash_item->types == 'c') {
+            printf("[%c: ", hash_item->key);
         }
 
-        if(*(hash_object->types + 1) == 'i') {
-            printf("%d]", hash_object->value);
+        if(*(hash_item->types + 1) == 'i') {
+            printf("%d]", hash_item->value);
         }
-        else if(*(hash_object->types + 1) == 'c') {
-            printf("%c]", hash_object->value);
+        else if(*(hash_item->types + 1) == 'c') {
+            printf("%c]", hash_item->value);
         }
 
         if(is_linked) {
@@ -66,12 +69,12 @@ void show_hash_object(const HashObject* hash_object, const int is_linked) {
     }
 }
 
-void show_linked_hash_objects(HashObject* hash_object) {
-    HashObject* cur_hash_object;
-    for(cur_hash_object = hash_object; cur_hash_object != NULL; cur_hash_object = cur_hash_object->next) {
-        show_hash_object(cur_hash_object, 1);
+void show_linked_hash_items(HashItem* hash_item) {
+    HashItem* cur_hash_item;
+    for(cur_hash_item = hash_item; cur_hash_item != NULL; cur_hash_item = cur_hash_item->next) {
+        show_hash_item(cur_hash_item, 1);
     }
-    show_hash_object(cur_hash_object, 1);
+    show_hash_item(cur_hash_item, 1);
 }
 
 
@@ -89,7 +92,7 @@ HashTable* create_hash_table(const int size) {
 
     if(hash_table != NULL) {
         hash_table->size = size;
-        hash_table->buckets = (HashObject**) malloc(size * sizeof(HashObject*));
+        hash_table->buckets = (HashItem**) malloc(size * sizeof(HashItem*));
     }
 
     return hash_table;
@@ -105,10 +108,10 @@ void show_hash_table(const HashTable* hash_table) {
 
         int i, empty = 1;
         for(i = 0; i < hash_table->size; i++) {
-            HashObject* bucket = *(hash_table->buckets + i);
+            HashItem* bucket = *(hash_table->buckets + i);
             if(bucket != NULL) {
                 empty = 0;
-                show_linked_hash_objects(bucket);
+                show_linked_hash_items(bucket);
             }
         }
 
@@ -118,82 +121,82 @@ void show_hash_table(const HashTable* hash_table) {
     }
 }
 
-HashObject* put(const HashTable* hash_table, const int key, const int value, char* types) {
-    HashObject* hash_object = NULL;
+HashItem* put(const HashTable* hash_table, const int key, const int value, char* types) {
+    HashItem* hash_item = NULL;
 
-    int code = hash_code(key, hash_table->size);
-    hash_object = *(hash_table->buckets + code);
+    hash_item = get(hash_table, key, *types);
 
-    if(hash_object == NULL) {
-        HashObject* new_hash_object = create_hash_object(key, value, types, code);
-        new_hash_object->length = 1;
-        new_hash_object->tail = new_hash_object;
-
-        *(hash_table->buckets + code) = new_hash_object;
-
-        return new_hash_object;
+    if(hash_item != NULL) {         // replace the value
+        hash_item->value = value;
+        hash_item->types = types;
     }
     else {
-        // TODO extract it to function get
-        char key_type = *types;
-        for(; hash_object != NULL; hash_object = hash_object->next) {
-            if(hash_object->key == key && *hash_object->types == key_type) {
-                break;
-            }
-        }
+        int code = hash_code(key, hash_table->size);
+        hash_item = create_hash_item(key, value, types, code);
 
-        HashObject* new_hash_object = hash_object;
-        if(new_hash_object != NULL) {
-            new_hash_object->value = value;
-            new_hash_object->types = types;
+        HashItem* head = *(hash_table->buckets + code);
+        if(head == NULL) {
+            head = hash_item;
+            *(hash_table->buckets + code) = head;
+            head->tail = head;
         }
         else {
-            new_hash_object = create_hash_object(key, value, types, code);
+            head->tail->next = hash_item;
+            hash_item->prev = head->tail;
 
-            HashObject* tail = (*(hash_table->buckets + code))->tail;
-            tail->next = new_hash_object;
-            new_hash_object->prev = tail;
-
-            (*(hash_table->buckets + code))->length++;
-            (*(hash_table->buckets + code))->tail = new_hash_object;
+            head->tail = head->tail->next;
         }
 
-        return new_hash_object;
+        head->length++;
     }
 
-    return NULL;
+    return hash_item;
 }
 
-// HashObject* get(const HashTable* hash_table, const int key) {
-//     int num_attempts = 0;
+HashItem* get(const HashTable* hash_table, const int key, const char key_type) {
+    int code = hash_code(key, hash_table->size);
+    HashItem* hash_item = *(hash_table->buckets + code);
 
-//     while(num_attempts < hash_table->size) {
-//         int code = hash_code(key, hash_table->size, num_attempts);
+    while(hash_item != NULL && (hash_item->key != key || *hash_item->types != key_type)) {
+        hash_item = hash_item->next;
+    }
 
-//         HashObject* hash_object = *(hash_table->buckets + code);
-//         if(hash_object == NULL) {
-//             return NULL;
-//         }
-//         else if(hash_object->key == key) {
-//             if(!hash_object->valid) {
-//                 return NULL;
-//             }
+    return hash_item;
+}
 
-//             return hash_object;
-//         }
+HashItem* pop(const HashTable* hash_table, const int key, const char key_type) {
+    HashItem* hash_item = get(hash_table, key, key_type);
 
-//         num_attempts++;
-//     }
+    if(hash_item != NULL) {
+        int code = hash_item->code;
+        HashItem* head = *(hash_table->buckets + code);
 
-//     return NULL;
-// }
+        if(hash_item == head) {
+            HashItem* new_head = head->next;
+            if(head->next != NULL) {
+                head->next->prev = NULL;
+                head->next->length = head->length - 1;
+                head->next->tail = head->tail;
+            }
 
-// HashObject* pop(const HashTable* hash_table, const int key) {
-//     HashObject* hash_object = get(hash_table, key);
+            *(hash_table->buckets + code) = head->next;
+        }
+        else {
+            HashItem* prev = hash_item->prev;
+            HashItem* next = hash_item->next;
+            hash_item->prev = hash_item->next = NULL;
 
-//     if((hash_object != NULL) && (hash_object->key == key) && hash_object->valid) {
-//         hash_object->valid = 0;
-//     }
+            prev->next = next;
+            if(hash_item == head->tail) {      // hash_item is tail
+                head->tail = prev;
+            }
+            else {
+                next->prev = prev;
+            }
 
-//     return hash_object;
-// }
+            head->length--;
+        }
+    }
+
+    return hash_item;
+}

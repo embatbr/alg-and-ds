@@ -3,31 +3,28 @@
  */
 
 
-/*
- * key_type and value_type: i - int, c - char
- */
-typedef struct _hash_object {
+typedef struct _hash_item {
     int key;
     int value;
-    char* types;
+    char* types;    // i = int, c = char
     int code;
 
-    struct _hash_object* prev;
-    struct _hash_object* next;
+    struct _hash_item* prev;
+    struct _hash_item* next;
     int length;                 // used only by the list head
-    struct _hash_object* tail;  // used only by the list head
-} HashObject;
+    struct _hash_item* tail;    // used only by the list head
+} HashItem;
 
 // time: O(1); space: O(1)
 int hash_code(int key, int size);
 
 // time: O(1); space: O(1)
-HashObject* create_hash_object(const int key, const int value, char* types, const int code);
+HashItem* create_hash_item(const int key, const int value, char* types, const int code);
 
 // time: O(1); space: O(1)
-void show_hash_object(const HashObject* hash_object, const int is_linked);
+void show_hash_item(const HashItem* hash_item, const int is_linked);
 
-void show_linked_hash_objects(HashObject* hash_object);
+void show_linked_hash_items(HashItem* hash_item);
 
 
 /*
@@ -36,7 +33,7 @@ void show_linked_hash_objects(HashObject* hash_object);
  */
 typedef struct {
     int size;
-    HashObject** buckets;
+    HashItem** buckets;
 } HashTable;
 
 // time: O(1); space: O(1)
@@ -46,9 +43,9 @@ HashTable* create_hash_table(const int size);
 void show_hash_table(const HashTable* hash_table);
 
 // time: O(1) (amortized O(Nk), k = average list length); space: O(1) (amortized O(k))
-HashObject* put(const HashTable* hash_table, const int key, const int value, char* types);
+HashItem* put(const HashTable* hash_table, const int key, const int value, char* types);
 
-// // time: O(1) (amortized O(N)); space ?
-// HashObject* get(const HashTable* hash_table, const int key);
+// // time: O(1) (amortized O(k)); space O(1)
+HashItem* get(const HashTable* hash_table, const int key, const char key_type);
 
-// HashObject* pop(const HashTable* hash_table, const int key);
+HashItem* pop(const HashTable* hash_table, const int key, const char key_type);
