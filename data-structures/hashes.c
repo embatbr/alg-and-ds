@@ -122,9 +122,7 @@ void show_hash_table(const HashTable* hash_table) {
 }
 
 HashItem* put(const HashTable* hash_table, const int key, const int value, char* types) {
-    HashItem* hash_item = NULL;
-
-    hash_item = get(hash_table, key, *types);
+    HashItem* hash_item = get(hash_table, key, *types);
 
     if(hash_item != NULL) {         // replace the value
         hash_item->value = value;
