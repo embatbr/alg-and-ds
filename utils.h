@@ -15,3 +15,6 @@ int strequal(const char* str_a, const char* str_b);
 
 
 int call_question(const char* question, const char* desired);
+
+
+char* int2str(const int num_param);

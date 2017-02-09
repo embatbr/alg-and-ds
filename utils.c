@@ -52,3 +52,36 @@ int strequal(const char* str_a, const char* str_b) {
 int call_question(const char* question, const char* desired) {
     return strequal(question, "all") || strequal(question, desired);
 }
+
+
+char* int2str(const int num_param) {
+    int num = num_param;
+    int digit, num_digits = 0;
+
+    // count string size
+    do {
+        double num_d = (double) num;
+        digit = (int) ((num_d/10 - num/10) * 10);
+        num_digits++;
+        num = num / 10;
+    }
+    while(num != 0);
+
+    // allocate string
+    char* digits = (char*) malloc(num_digits * sizeof(char));
+
+    int i;
+    num = num_param;
+
+    // parse
+    for(i = num_digits - 1; i >= 0; i--) {
+        double num_d = (double) num;
+        digit = (int) ((num_d/10 - num/10 + 0.01) * 10); // 0.01 is to correct the decimal imprecision
+
+        *(digits + i) = digit + 48;
+
+        num = num / 10;
+    }
+
+    return digits;
+}
