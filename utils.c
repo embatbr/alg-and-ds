@@ -85,3 +85,30 @@ char* int2str(const int num_param) {
 
     return digits;
 }
+
+void int2str2(const int num_param, char* output) {
+    int num = num_param;
+    int digit, num_digits = 0;
+
+    // count string size
+    do {
+        double num_d = (double) num;
+        digit = (int) ((num_d/10 - num/10) * 10);
+        num_digits++;
+        num = num / 10;
+    }
+    while(num != 0);
+
+    int i;
+    num = num_param;
+
+    // parse
+    for(i = num_digits - 1; i >= 0; i--) {
+        double num_d = (double) num;
+        digit = (int) ((num_d/10 - num/10 + 0.01) * 10); // 0.01 is to correct the decimal imprecision
+
+        *(output + i) = digit + 48;
+
+        num = num / 10;
+    }
+}
