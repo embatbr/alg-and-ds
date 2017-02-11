@@ -112,3 +112,12 @@ void int2str2(const int num_param, char* output) {
         num = num / 10;
     }
 }
+
+
+void show_square_matrix(const int* matrix, const int size) {
+    int i;
+    for(i = 0; i < size*size; i++) {
+        char sep = ((i + 1) % size) == 0 ? '\n' : ' ';
+        printf("%4d%c", matrix[i], sep);
+    }
+}

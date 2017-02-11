@@ -20,3 +20,6 @@ int call_question(const char* question, const char* desired);
 char* int2str(const int num_param);
 
 void int2str2(const int num_param, char* output);
+
+
+void show_square_matrix(const int* matrix, const int size);
