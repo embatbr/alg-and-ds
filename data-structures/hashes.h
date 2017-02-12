@@ -27,10 +27,6 @@ void show_hash_item(const HashItem* hash_item, const int is_linked);
 void show_linked_hash_items(HashItem* hash_item);
 
 
-/*
- * In case of collision, rehashes the key to another array position. This table
- * can store int or char keys and values in the same array.
- */
 typedef struct {
     int size;
     HashItem** buckets;
@@ -45,7 +41,8 @@ void show_hash_table(const HashTable* hash_table);
 // time: O(1) (amortized O(Nk), k = average list length); space: O(1) (amortized O(k))
 HashItem* put(const HashTable* hash_table, const int key, const int value, char* types);
 
-// // time: O(1) (amortized O(k)); space O(1)
+// time: O(1) (amortized O(k)); space O(1)
 HashItem* get(const HashTable* hash_table, const int key, const char key_type);
 
+// time: O(1) (amortized O(k)); space O(1)
 HashItem* pop(const HashTable* hash_table, const int key, const char key_type);

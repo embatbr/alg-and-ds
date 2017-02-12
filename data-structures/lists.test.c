@@ -30,42 +30,6 @@ void main() {
     printf("\nAppend %d to list\n", value);
     show_list(list);
 
-    value = 13;
-    int index = -1;
-    printf("\nInsert %d into list at position %d\n", value, index);
-    Node* new_node = insert_value(list, value, index);
-    show_node(new_node);
-
-    value = 13;
-    index = list->length + 1;
-    printf("\nInsert %d into list at position %d\n", value, index);
-    new_node = insert_value(list, value, index);
-    show_node(new_node);
-
-    value = 13;
-    index = 5;
-    printf("\nInsert %d into list at position %d\n", value, index);
-    new_node = insert_value(list, value, index);
-    show_node(new_node);
-    printf("List:\n");
-    show_list(list);
-
-    value = 80;
-    index = 0;
-    printf("\nInsert %d into list at position %d\n", value, index);
-    new_node = insert_value(list, value, index);
-    show_node(new_node);
-    printf("List:\n");
-    show_list(list);
-
-    value = -200;
-    index = list->length;
-    printf("\nInsert %d into list at position %d\n", value, index);
-    new_node = insert_value(list, value, index);
-    show_node(new_node);
-    printf("List:\n");
-    show_list(list);
-
     value = 0;
     Node* found = find(list, value);
     printf("\nSearching a node with value %d\n", value);
@@ -76,92 +40,22 @@ void main() {
     printf("\nSearching a node with value %d\n", value);
     show_node(found);
 
-    value = 0;
-    Node** nodes = find_all(list, value);
-    printf("\nSearching all nodes with value %d\n", value);
-    for(i = 0; i < list->length; i++) {
-        Node* n = *(nodes + i);
-        show_node(n);
-    }
-
-    value = 13;
-    nodes = find_all(list, value);
-    printf("\nSearching all nodes with value %d\n", value);
-    for(i = 0; i < list->length; i++) {
-        Node* n = *(nodes + i);
-        show_node(n);
-    }
-
     printf("\nCurrent list:\n");
     show_list(list);
 
-    index = 0;
-    printf("\nRemoving the head (index %d)\n", index);
-    Node* removed_node = remove_by_index(list, index);
-    show_node(removed_node);
+    Node* head = list->head;
+    printf("\nRemoving the head\n");
+    remove_node(list, head);
     show_list(list);
 
-    index = 4;
-    printf("\nRemoving the element at index %d\n", index);
-    removed_node = remove_by_index(list, index);
-    show_node(removed_node);
+    Node* tail = list->tail;
+    printf("\nRemoving the tail\n");
+    remove_node(list, tail);
     show_list(list);
 
-    index = list->length - 1;
-    printf("\nRemoving the tail (index %d)\n", index);
-    removed_node = remove_by_index(list, index);
-    show_node(removed_node);
-    show_list(list);
-
-    value = -1;
-    printf("\nRemoving element of value %d\n", value);
-    removed_node = remove_value(list, value);
-    show_node(removed_node);
-    show_list(list);
-
-    value = 11;
-    printf("\nRemoving element of value %d\n", value);
-    removed_node = remove_value(list, value);
-    show_node(removed_node);
-    show_list(list);
-
-    value = 17;
-    printf("\nRemoving element of value %d\n", value);
-    removed_node = remove_value(list, value);
-    show_node(removed_node);
-    show_list(list);
-
-    value = 13;
-    append(list, value);
-    printf("\nRemoving element with value %d\n", value);
-    removed_node = remove_value(list, value);
-    show_node(removed_node);
-    show_list(list);
-
-    value = 0;
-    nodes = remove_all_values(list, value);
-    printf("\nRemoving all nodes with value %d\n", value);
-    for(i = 0; i < list->length; i++) {
-        Node* n = *(nodes + i);
-        show_node(n);
-    }
-    show_list(list);
-
-    value = 13;
-    nodes = remove_all_values(list, value);
-    printf("\nRemoving all nodes with value %d\n", value);
-    for(i = 0; i < list->length; i++) {
-        Node* n = *(nodes + i);
-        show_node(n);
-    }
-    show_list(list);
-
-    value = 12;
-    nodes = remove_all_values(list, value);
-    printf("\nRemoving all nodes with value %d\n", value);
-    for(i = 0; i < list->length; i++) {
-        Node* n = *(nodes + i);
-        show_node(n);
-    }
+    node = list->head->next->next->next;
+    printf("\nRemoving the node ");
+    show_node(node);
+    remove_node(list, node);
     show_list(list);
 }

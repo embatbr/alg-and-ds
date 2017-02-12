@@ -4,16 +4,19 @@
 
 
 /*
- * LINKED LISTS
+ * (DOUBLY) LINKED LISTS
  */
 
 
 typedef struct _node {
     int value;
+    struct _node* prev;
     struct _node* next;
 } Node;
 
 Node* create_node(const int value);
+
+void show_node_sufix(const Node* A, const char* sufix);
 
 void show_node(const Node* A);
 
@@ -24,37 +27,35 @@ typedef struct {
     int length;
 } LinkedList;
 
-// time: O(N), space: O(N)
+// time: O(N); space: O(N)
 LinkedList* create_linked_list(const int* values, const int length);
 
-// time: O(N), space: O(1)
+// time: O(N); space: O(1)
 void show_list(const LinkedList* list);
 
-// time: O(1), space: O(1)
+// time: O(1); space: O(1)
 void append(LinkedList* list, const int value);
 
-// time: O(N), space: O(1)
-Node* insert_value(LinkedList* list, const int value, const int index);
-
-// time: O(N), space: O(1)
+// time: O(N); space: O(1)
 Node* find(const LinkedList* list, const int value);
 
-// time: O(N), space: O(N)
-Node** find_all(const LinkedList* list, const int value);
-
-// time: O(N), space: O(1)
-Node* remove_by_index(LinkedList* list, const int index);
-
-// time: O(N), space: O(1)
-Node* remove_value(LinkedList* list, const int value);
-
-// time: O(N), space: O(1)
-Node** remove_all_values(LinkedList* list, const int value);
+// time: O(1); space O(1)
+void remove_node(LinkedList* list, Node* node);
 
 
-/*
- * DOUBLY LINKED LISTS
- */
+typedef struct {
+    int size;
+    Node** buckets;
+} NodeHashTable;
 
+// time: O(1); space O(1)
+int node_hash_code(int key, int size);
 
-// TODO
+// time: O(1); space: O(1)
+NodeHashTable* create_node_hash_table(const int size);
+
+// time: O(1); space: O(1) (amortized O(k))
+void put_node(const NodeHashTable* node_hash_table, const int key, Node* node);
+
+// time: O(1); space: O(1) (amortized O(k))
+Node* get_node(const NodeHashTable* node_hash_table, const int key);

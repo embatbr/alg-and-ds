@@ -16,18 +16,22 @@ Node* create_node(const int value) {
     }
 
     node->value = value;
-    node->next = NULL;
+    node->prev = node->next = NULL;
 
     return node;
 }
 
-void show_node(const Node* node) {
+void show_node_sufix(const Node* node, const char* sufix) {
     if(node == NULL) {
         printf("%p\n", NULL);
     }
     else {
-        printf("%p: (%d, %p)\n", node, node->value, node->next);
+        printf("%p: (%p, %d, %p)%s\n", node, node->prev, node->value, node->next, sufix);
     }
+}
+
+void show_node(const Node* node) {
+    show_node_sufix(node, "");
 }
 
 
@@ -45,7 +49,8 @@ LinkedList* create_linked_list(const int* values, const int length) {
         }
         else {
             list->tail->next = node;
-            list->tail = list->tail->next;
+            node->prev = list->tail;
+            list->tail = node;
         }
     }
 
@@ -58,55 +63,31 @@ void show_list(const LinkedList* list) {
     }
     else {
         printf("length: %d\n", list->length);
-        printf("head: %p\n", list->head);
-        printf("tail: %p\n", list->tail);
 
-        Node* cur = list->head;
-        while(cur != NULL) {
-            show_node(cur);
-            cur = cur->next;
+        Node* cur_node = list->head;
+        while(cur_node != NULL) {
+            if(cur_node == list->head) {
+                show_node_sufix(cur_node, " [head]");
+            }
+            else if(cur_node == list->tail) {
+                show_node_sufix(cur_node, " [tail]");
+            }
+            else {
+                show_node(cur_node);
+            }
+            cur_node = cur_node->next;
         }
     }
 }
 
 void append(LinkedList* list, const int value) {
-    list->tail->next = create_node(value);
-    list->tail = list->tail->next;
-    list->length++;
-}
+    Node* node = create_node(value);
 
-Node* insert_value(LinkedList* list, const int value, const int index) {
-    if((index < 0) || (index > list->length)) {
-        return NULL;
-    }
-
-    Node* new_node = create_node(value);
-
-    if(index == 0) {
-        new_node->next = list->head;
-        list->head = new_node;
-    }
-    else if(index == list->length) {
-        list->tail->next = new_node;
-        list->tail = new_node;
-    }
-    else {
-        Node* prev_node = NULL;
-        Node* cur_node = list->head;
-        int cur_index = 0;
-
-        while(cur_index < index) {
-            prev_node = cur_node;
-            cur_node = cur_node->next;
-            cur_index++;
-        }
-
-        new_node->next = cur_node;
-        prev_node->next = new_node;
-    }
+    list->tail->next = node;
+    node->prev = list->tail;
+    list->tail = node;
 
     list->length++;
-    return new_node;
 }
 
 Node* find(const LinkedList* list, const int value) {
@@ -121,110 +102,64 @@ Node* find(const LinkedList* list, const int value) {
     return cur_node;
 }
 
-Node** find_all(const LinkedList* list, const int value) {
-    Node** nodes = (Node**) malloc(list->length * sizeof(Node*));
+/*
+ * Assuming node is in the list
+ */
+void remove_node(LinkedList* list, Node* node) {
+    Node* prev = node->prev;
+    Node* next = node->next;
 
-    Node* cur_node;
-    int i = 0;
+    // node->prev = node->next = NULL;
 
-    for(cur_node = list->head; cur_node != NULL; cur_node = cur_node->next) {
-        if(cur_node->value == value) {
-            *(nodes + i) = cur_node;
-            i++;
-        }
+    if(prev != NULL) {
+        prev->next = next;
     }
-
-    return nodes;
-}
-
-Node* remove_by_index(LinkedList* list, const int index) {
-    if((index < 0) || (index > list->length)) {
-        return NULL;
+    if(next != NULL) {
+        next->prev = prev;
     }
-
-    Node* prev_node = NULL;
-    Node* cur_node = list->head;
-    int cur_index = 0;
-
-    while(cur_index < index) {
-        prev_node = cur_node;
-        cur_node = cur_node->next;
-        cur_index++;
+    if(node == list->head) {
+        list->head = next;
     }
-
-    if(index == 0) {
-        list->head = list->head->next;
-    }
-    else {
-        prev_node->next = cur_node->next;
-
-        if(cur_index == list->length - 1) {
-            list->tail = prev_node;
-        }
+    if(node == list->tail) {
+        list->tail = prev;
     }
 
     list->length--;
-
-    return cur_node;
 }
 
-Node* remove_value(LinkedList* list, const int value) {
-    Node* prev_node = NULL;
-    Node* cur_node;
 
-    for(cur_node = list->head; cur_node != NULL; cur_node = cur_node->next) {
-        if(cur_node->value == value) {
-            if(prev_node == NULL) {
-                list->head = cur_node->next;
-            }
-            else {
-                prev_node->next = cur_node->next;
+/*
+ * Functions for type NodeHashTable
+ */
 
-                if(list->tail == cur_node) {
-                    list->tail = prev_node;
-                }
-            }
 
-            list->length--;
-            break;
-        }
-        else {
-            prev_node = cur_node;
-        }
-    }
-
-    return cur_node;
+int node_hash_code(int key, int size) {
+    return key % size;
 }
 
-Node** remove_all_values(LinkedList* list, const int value) {
-    Node** nodes = (Node**) malloc(list->length * sizeof(Node*));
-
-    Node* prev_node = NULL;
-    Node* cur_node;
-    int i = 0;
-
-    for(cur_node = list->head; cur_node != NULL; cur_node = cur_node->next) {
-        if(cur_node->value == value) {
-            *(nodes + i) = cur_node;
-            i++;
-
-            if(prev_node == NULL) {
-                list->head = cur_node->next;
-            }
-            else {
-                prev_node->next = cur_node->next;
-
-                if(list->tail == cur_node) {
-                    list->tail = prev_node;
-                }
-            }
-
-            list->length--;
-        }
-        else {
-            prev_node = cur_node;
-        }
+NodeHashTable* create_node_hash_table(const int size) {
+    if(size <= 0) {
+        return NULL;
     }
 
-    return nodes;
+    NodeHashTable* node_hash_table = (NodeHashTable*) malloc(sizeof(NodeHashTable));
+
+    if(node_hash_table != NULL) {
+        node_hash_table->size = size;
+        node_hash_table->buckets = (Node**) malloc(size * sizeof(Node*));
+    }
+
+    return node_hash_table;
+}
+
+void put_node(const NodeHashTable* node_hash_table, const int key, Node* node) {
+    int code = node_hash_code(key, node_hash_table->size);
+
+    *(node_hash_table->buckets + code) = node;
+}
+
+Node* get_node(const NodeHashTable* node_hash_table, const int key) {
+    int code = node_hash_code(key, node_hash_table->size);
+
+    return *(node_hash_table->buckets + code);
 }
