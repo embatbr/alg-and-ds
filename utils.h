@@ -3,6 +3,9 @@
  */
 
 
+#define BOOL(x) (x ? "TRUE" : "FALSE")
+
+
 void show_array_int(const int* input, const int length);
 
 
