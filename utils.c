@@ -115,9 +115,19 @@ void int2str2(const int num_param, char* output) {
 
 
 void show_square_matrix(const int* matrix, const int size) {
+    show_matrix(matrix, size, size);
+}
+
+void show_matrix(const int* matrix, const int M, const int N) {
     int i;
-    for(i = 0; i < size*size; i++) {
-        char sep = ((i + 1) % size) == 0 ? '\n' : ' ';
-        printf("%4d%c", matrix[i], sep);
+    for(i = 0; i < M; i++) {
+        int j;
+        for(j = 0; j < N; j++) {
+            int position = i*N + (j % N);
+            int element = matrix[position];
+            char sep = ((j + 1) % N) == 0 ? '\n' : ' ';
+
+            printf("%4d%c", element, sep);
+        }
     }
 }

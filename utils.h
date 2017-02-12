@@ -23,3 +23,5 @@ void int2str2(const int num_param, char* output);
 
 
 void show_square_matrix(const int* matrix, const int size);
+
+void show_matrix(const int* matrix, const int M, const int N);
