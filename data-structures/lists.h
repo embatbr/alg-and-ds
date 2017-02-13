@@ -27,11 +27,17 @@ typedef struct {
     int length;
 } LinkedList;
 
+// time: O(1); space: O(1)
+LinkedList* create_empty_linked_list();
+
 // time: O(N); space: O(N)
 LinkedList* create_linked_list(const int* values, const int length);
 
 // time: O(N); space: O(1)
 void show_list(const LinkedList* list);
+
+// time: O(1); space: O(1)
+void append_node(LinkedList* list, Node* node);
 
 // time: O(1); space: O(1)
 void append(LinkedList* list, const int value);

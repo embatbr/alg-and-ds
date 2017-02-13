@@ -35,8 +35,14 @@ void show_node(const Node* node) {
 }
 
 
-LinkedList* create_linked_list(const int* values, const int length) {
+LinkedList* create_empty_linked_list() {
     LinkedList* list = (LinkedList*) malloc(sizeof(LinkedList));
+    list->length = 0;
+    list->head = list->tail = NULL;
+}
+
+LinkedList* create_linked_list(const int* values, const int length) {
+    LinkedList* list = create_empty_linked_list();
     list->length = length;
 
     int i;
@@ -80,14 +86,22 @@ void show_list(const LinkedList* list) {
     }
 }
 
-void append(LinkedList* list, const int value) {
-    Node* node = create_node(value);
-
-    list->tail->next = node;
-    node->prev = list->tail;
-    list->tail = node;
+void append_node(LinkedList* list, Node* node) {
+    if(list->length > 0) {
+        list->tail->next = node;
+        node->prev = list->tail;
+        list->tail = node;
+    }
+    else {
+        list->head = list->tail = node;
+    }
 
     list->length++;
+}
+
+void append(LinkedList* list, const int value) {
+    Node* node = create_node(value);
+    append_node(list, node);
 }
 
 Node* find(const LinkedList* list, const int value) {
